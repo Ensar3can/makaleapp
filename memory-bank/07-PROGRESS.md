@@ -7,7 +7,9 @@ Append-only. Newest entries at the top.
 ENSAR asked to publish the repo to GitHub and keep `main` current, plus a gap list and a plan.
 
 - Remote: `https://github.com/Ensar3can/makaleapp.git` (private; was empty)
-- First commit on `main`; CI already defined in `.github/workflows/ci.yml`
+- First commit `1ac8980` on GitHub `main`; local `master` tracks `origin/main`
+- CI: `.github/workflows/ci.yml` on push/PR
+- Tracking issue: https://github.com/Ensar3can/makaleapp/issues/1
 - Root duplicate Stitch zip gitignored; `.env` files stay untracked
 - Post-v1.0 waves A–D recorded in `05-PHASE-PLAN.md` (SMTP / Compose / env / AI; e2e; reserved product; optional FTS)
 

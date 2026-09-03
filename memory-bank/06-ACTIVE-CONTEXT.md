@@ -19,7 +19,8 @@ Numbered backend phases 0–16 remain complete. Intentionally remaining (not v1.
 ## GitHub
 
 - Remote: `https://github.com/Ensar3can/makaleapp.git` (private)
-- Default branch: `main`
+- Default branch: `main` (local `master` tracks `origin/main`)
+- Tracking issue: https://github.com/Ensar3can/makaleapp/issues/1
 - CI: `.github/workflows/ci.yml` on push/PR
 - Do not commit `.env` files
 
