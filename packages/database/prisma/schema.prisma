@@ -1,0 +1,439 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @db.UniqueIdentifier
+  email           String    @unique @db.NVarChar(254)
+  passwordHash    String    @db.NVarChar(255)
+  role            String    @db.NVarChar(16)
+  status          String    @db.NVarChar(16)
+  emailVerifiedAt DateTime?  @db.DateTime2
+  lastLoginAt     DateTime?  @db.DateTime2
+  createdAt       DateTime   @db.DateTime2
+  updatedAt       DateTime   @db.DateTime2
+
+  profile            Profile?
+  articles           Article[]
+  bookmarks          Bookmark[]
+  articleViews       ArticleView[]
+  moderationReviews  ModerationReview[]
+  auditLogs          AuditLog[]
+  sessions           Session[]
+  authTokens         AuthToken[]
+}
+
+model Session {
+  id        String    @id @db.UniqueIdentifier
+  userId    String    @db.UniqueIdentifier
+  tokenHash String    @unique @db.NVarChar(64)
+  expiresAt DateTime  @db.DateTime2
+  revokedAt DateTime? @db.DateTime2
+  ipHash    String?   @db.NVarChar(64)
+  userAgent String?   @db.NVarChar(512)
+  createdAt DateTime  @db.DateTime2
+
+  user User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model AuthToken {
+  id         String    @id @db.UniqueIdentifier
+  userId     String    @db.UniqueIdentifier
+  purpose    String    @db.NVarChar(32)
+  tokenHash  String    @unique @db.NVarChar(64)
+  expiresAt  DateTime  @db.DateTime2
+  consumedAt DateTime? @db.DateTime2
+  createdAt  DateTime  @db.DateTime2
+
+  user User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([userId, purpose])
+}
+
+model LoginAttempt {
+  id        String   @id @db.UniqueIdentifier
+  email     String   @db.NVarChar(254)
+  succeeded Boolean
+  createdAt DateTime @db.DateTime2
+
+  @@index([email, createdAt])
+}
+
+model Profile {
+  id          String   @id @db.UniqueIdentifier
+  userId      String   @unique @db.UniqueIdentifier
+  displayName String   @db.NVarChar(80)
+  username    String   @unique @db.NVarChar(160)
+  bio         String   @db.NVarChar(500)
+  avatarUrl   String?  @db.NVarChar(2048)
+  websiteUrl  String?  @db.NVarChar(2048)
+  createdAt   DateTime @db.DateTime2
+  updatedAt   DateTime @db.DateTime2
+
+  user User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Category {
+  id          String   @id @db.UniqueIdentifier
+  name        String   @db.NVarChar(80)
+  slug        String   @unique @db.NVarChar(160)
+  description String   @db.NVarChar(400)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @db.DateTime2
+  updatedAt   DateTime @db.DateTime2
+
+  articles ArticleCategory[]
+
+  @@index([isActive, name])
+}
+
+model Tag {
+  id        String   @id @db.UniqueIdentifier
+  name      String   @db.NVarChar(40)
+  slug      String   @unique @db.NVarChar(160)
+  createdAt DateTime @db.DateTime2
+
+  articles ArticleTag[]
+}
+
+model Article {
+  id                   String        @id @db.UniqueIdentifier
+  authorId             String        @db.UniqueIdentifier
+  slug                 String        @unique @db.NVarChar(160)
+  language             String        @db.NVarChar(2)
+  status               String        @db.NVarChar(32)
+  currentVersionId     String        @db.UniqueIdentifier
+  currentVersionNumber Int
+  currentContentHash   String        @db.NVarChar(64)
+  publishedAt          DateTime?     @db.DateTime2
+  createdAt            DateTime      @db.DateTime2
+  updatedAt            DateTime      @db.DateTime2
+
+  author            User               @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  versions          ArticleVersion[]
+  files             ArticleFile[]
+  categories        ArticleCategory[]
+  tags              ArticleTag[]
+  analysisJobs      AnalysisJob[]
+  analysisRuns      AnalysisRun[]
+  scoreSnapshots    ScoreSnapshot[]
+  sourceReferences  SourceReference[]
+  moderationReviews ModerationReview[]
+  bookmarks         Bookmark[]
+  views             ArticleView[]
+
+  @@index([status])
+  @@index([authorId])
+  @@index([publishedAt])
+  @@index([status, publishedAt])
+  @@index([status, language, publishedAt])
+  @@index([authorId, updatedAt])
+  @@index([status, updatedAt])
+  @@index([currentVersionId])
+  @@index([currentContentHash])
+}
+
+model ArticleVersion {
+  id            String   @id @db.UniqueIdentifier
+  articleId     String   @db.UniqueIdentifier
+  versionNumber Int
+  title         String   @db.NVarChar(200)
+  abstract      String   @db.NVarChar(2000)
+  content       String   @db.NVarChar(Max)
+  contentHash   String   @db.NVarChar(64)
+  createdAt     DateTime @db.DateTime2
+
+  article        Article         @relation(fields: [articleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  analysisJobs   AnalysisJob[]
+  analysisRuns   AnalysisRun[]
+  scoreSnapshots ScoreSnapshot[]
+  moderationReviews ModerationReview[]
+
+  @@unique([articleId, versionNumber])
+  @@index([contentHash])
+}
+
+model ArticleFile {
+  id               String   @id @db.UniqueIdentifier
+  articleId        String   @db.UniqueIdentifier
+  storageKey       String   @db.NVarChar(512)
+  originalFilename String   @db.NVarChar(255)
+  mimeType         String   @db.NVarChar(127)
+  fileSize         Int
+  checksum         String   @db.NVarChar(64)
+  createdAt        DateTime @db.DateTime2
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([articleId])
+}
+
+model ArticleCategory {
+  articleId  String @db.UniqueIdentifier
+  categoryId String @db.UniqueIdentifier
+
+  article  Article  @relation(fields: [articleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([articleId, categoryId])
+  @@index([categoryId])
+}
+
+model ArticleTag {
+  articleId String @db.UniqueIdentifier
+  tagId     String @db.UniqueIdentifier
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([articleId, tagId])
+  @@index([tagId])
+}
+
+model AnalysisJob {
+  id               String            @id @db.UniqueIdentifier
+  articleId        String            @db.UniqueIdentifier
+  articleVersionId String            @db.UniqueIdentifier
+  status           String            @db.NVarChar(16)
+  attemptCount     Int
+  queuedAt         DateTime          @db.DateTime2
+  startedAt        DateTime?         @db.DateTime2
+  completedAt      DateTime?         @db.DateTime2
+  failureReason    String?           @db.NVarChar(2000)
+  createdAt        DateTime          @db.DateTime2
+  updatedAt        DateTime          @db.DateTime2
+
+  article        Article        @relation(fields: [articleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  articleVersion ArticleVersion @relation(fields: [articleVersionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([status])
+  @@index([articleId])
+  @@index([articleVersionId, status])
+  @@index([status, queuedAt])
+}
+
+model AnalysisRun {
+  id               String            @id @db.UniqueIdentifier
+  articleId        String            @db.UniqueIdentifier
+  articleVersionId String            @db.UniqueIdentifier
+  status           String            @db.NVarChar(16)
+  pipelineVersion  String            @db.NVarChar(64)
+  promptVersion    String            @db.NVarChar(64)
+  modelProvider    String            @db.NVarChar(64)
+  modelName        String            @db.NVarChar(128)
+  startedAt        DateTime?         @db.DateTime2
+  completedAt      DateTime?         @db.DateTime2
+  tokenUsage       Int?
+  estimatedCost    Decimal?          @db.Decimal(12, 6)
+  createdAt        DateTime          @db.DateTime2
+
+  article          Article            @relation(fields: [articleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  articleVersion   ArticleVersion     @relation(fields: [articleVersionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  metrics          AnalysisMetric[]
+  evidence         AnalysisEvidence[]
+  sourceReferences SourceReference[]
+  scoreSnapshots   ScoreSnapshot[]
+  usageRecords     AiUsageRecord[]
+
+  @@index([articleVersionId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([status, createdAt])
+}
+
+model AnalysisMetric {
+  id            String   @id @db.UniqueIdentifier
+  analysisRunId String   @db.UniqueIdentifier
+  metricType    String   @db.NVarChar(32)
+  score         Decimal    @db.Decimal(5, 2)
+  confidence    Decimal    @db.Decimal(5, 2)
+  explanation   String     @db.NVarChar(Max)
+  createdAt     DateTime   @db.DateTime2
+
+  analysisRun AnalysisRun @relation(fields: [analysisRunId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([analysisRunId, metricType])
+}
+
+model AnalysisEvidence {
+  id            String   @id @db.UniqueIdentifier
+  analysisRunId String   @db.UniqueIdentifier
+  metricType    String   @db.NVarChar(32)
+  evidenceType  String     @db.NVarChar(64)
+  claim         String     @db.NVarChar(Max)
+  evidence      String     @db.NVarChar(Max)
+  sourceUrl     String?    @db.NVarChar(2048)
+  sourceTitle   String?    @db.NVarChar(500)
+  reliability   Decimal?   @db.Decimal(5, 2)
+  createdAt     DateTime   @db.DateTime2
+
+  analysisRun AnalysisRun @relation(fields: [analysisRunId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([analysisRunId])
+}
+
+model SourceReference {
+  id                 String                      @id @db.UniqueIdentifier
+  articleId          String                      @db.UniqueIdentifier
+  analysisRunId      String                      @db.UniqueIdentifier
+  url                String                      @db.NVarChar(2048)
+  title              String                      @db.NVarChar(500)
+  publisher          String?                     @db.NVarChar(255)
+  doi                String?                     @db.NVarChar(128)
+  sourceType         String                      @db.NVarChar(64)
+  verificationStatus String  @db.NVarChar(32)
+  reliabilityScore   Decimal?                    @db.Decimal(5, 2)
+  createdAt          DateTime                    @db.DateTime2
+
+  article     Article     @relation(fields: [articleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  analysisRun AnalysisRun @relation(fields: [analysisRunId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([articleId])
+  @@index([analysisRunId])
+}
+
+model ScoreSnapshot {
+  id                        String                    @id @db.UniqueIdentifier
+  articleId                 String                    @db.UniqueIdentifier
+  articleVersionId          String                    @db.UniqueIdentifier
+  analysisRunId             String                    @unique @db.UniqueIdentifier
+  qualityScore              Decimal                   @db.Decimal(5, 2)
+  authorshipRisk            Decimal                   @db.Decimal(5, 2)
+  authorshipConfidence      Decimal                   @db.Decimal(5, 2)
+  authorshipIntegrity       Decimal                   @db.Decimal(5, 2)
+  authorshipClassification  String                    @db.NVarChar(16)
+  overallScore              Decimal                   @db.Decimal(5, 2)
+  scoringPolicyVersion      String                    @db.NVarChar(32)
+  createdAt                 DateTime                  @db.DateTime2
+
+  article        Article        @relation(fields: [articleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  articleVersion ArticleVersion @relation(fields: [articleVersionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  analysisRun    AnalysisRun    @relation(fields: [analysisRunId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([articleVersionId, createdAt])
+  @@index([overallScore])
+}
+
+model ScoringPolicy {
+  version                            String   @id @db.NVarChar(32)
+  qualityWeights                     String   @db.NVarChar(Max)
+  qualityWeight                      Decimal  @db.Decimal(9, 8)
+  authorshipIntegrityWeight          Decimal  @db.Decimal(9, 8)
+  authorshipConfidenceThreshold      Decimal  @db.Decimal(5, 2)
+  authorshipClassificationThresholds String   @db.NVarChar(Max)
+  isActive                           Boolean  @default(false)
+  createdAt                          DateTime @db.DateTime2
+  updatedAt                          DateTime @db.DateTime2
+}
+
+model ModerationReview {
+  id               String   @id @db.UniqueIdentifier
+  articleId        String   @db.UniqueIdentifier
+  articleVersionId String   @db.UniqueIdentifier
+  moderatorId      String   @db.UniqueIdentifier
+  decision         String   @db.NVarChar(32)
+  reason           String   @db.NVarChar(2000)
+  notes            String   @db.NVarChar(Max)
+  createdAt        DateTime @db.DateTime2
+
+  article        Article        @relation(fields: [articleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  articleVersion ArticleVersion @relation(fields: [articleVersionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  moderator      User           @relation(fields: [moderatorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([articleId, createdAt])
+  @@index([articleVersionId])
+  @@index([moderatorId])
+}
+
+model Bookmark {
+  userId    String   @db.UniqueIdentifier
+  articleId String   @db.UniqueIdentifier
+  createdAt DateTime @db.DateTime2
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  article Article @relation(fields: [articleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([userId, articleId])
+  @@index([articleId])
+}
+
+model ArticleView {
+  id          String   @id @db.UniqueIdentifier
+  articleId   String   @db.UniqueIdentifier
+  userId      String?  @db.UniqueIdentifier
+  sessionHash String?  @db.NVarChar(64)
+  createdAt   DateTime @db.DateTime2
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([articleId, createdAt])
+}
+
+model AiUsageRecord {
+  id            String   @id @db.UniqueIdentifier
+  analysisRunId String   @db.UniqueIdentifier
+  provider      String   @db.NVarChar(64)
+  model         String   @db.NVarChar(128)
+  promptId      String   @db.NVarChar(64)
+  promptVersion String   @db.NVarChar(64)
+  inputTokens   Int
+  outputTokens  Int
+  estimatedCost Decimal  @db.Decimal(12, 6)
+  latencyMs     Int
+  recordedAt    DateTime @db.DateTime2
+
+  analysisRun AnalysisRun @relation(fields: [analysisRunId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([analysisRunId])
+  @@index([recordedAt])
+  @@index([promptId, recordedAt])
+}
+
+model OperationalEvent {
+  id            String   @id @db.UniqueIdentifier
+  kind          String   @db.NVarChar(32)
+  requestId     String?  @db.NVarChar(64)
+  userId        String?  @db.UniqueIdentifier
+  articleId     String?  @db.UniqueIdentifier
+  analysisRunId String?  @db.UniqueIdentifier
+  jobId         String?  @db.UniqueIdentifier
+  durationMs    Int?
+  status        String   @db.NVarChar(64)
+  message       String   @db.NVarChar(500)
+  createdAt     DateTime @db.DateTime2
+
+  @@index([kind, createdAt])
+  @@index([createdAt])
+}
+
+model SystemHeartbeat {
+  component  String   @id @db.NVarChar(32)
+  lastSeenAt DateTime @db.DateTime2
+  status     String   @db.NVarChar(32)
+}
+
+model AuditLog {
+  id          String   @id @db.UniqueIdentifier
+  actorUserId String?  @db.UniqueIdentifier
+  action      String   @db.NVarChar(128)
+  entityType  String   @db.NVarChar(64)
+  entityId    String   @db.NVarChar(36)
+  metadata    String   @db.NVarChar(Max)
+  ipHash      String?  @db.NVarChar(64)
+  createdAt   DateTime @db.DateTime2
+
+  actor User? @relation(fields: [actorUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([entityType, entityId])
+  @@index([actorUserId, createdAt])
+}

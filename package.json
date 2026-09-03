@@ -1,0 +1,39 @@
+{
+  "name": "article-intelligence-platform",
+  "private": true,
+  "packageManager": "pnpm@10.15.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "turbo dev",
+    "lint": "eslint .",
+    "typecheck": "node scripts/typecheck.mjs",
+    "test": "node scripts/prisma-generate.mjs && vitest run",
+    "test:unit": "node scripts/prisma-generate.mjs && vitest run --config vitest.unit.config.ts",
+    "build": "turbo build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@aip/application": "workspace:*",
+    "@aip/auth": "workspace:*",
+    "@aip/config": "workspace:*",
+    "@aip/database": "workspace:*",
+    "@aip/storage": "workspace:*",
+    "@eslint/js": "^9.34.0",
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^22.18.0",
+    "eslint": "^9.34.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-boundaries": "^5.0.1",
+    "prettier": "^3.6.2",
+    "turbo": "^2.5.6",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.42.0",
+    "vitest": "^3.2.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "sharp", "prisma", "@prisma/engines", "@prisma/client"]
+  }
+}

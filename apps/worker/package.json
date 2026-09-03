@@ -1,0 +1,25 @@
+{
+  "name": "@aip/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aip/ai": "workspace:*",
+    "@aip/application": "workspace:*",
+    "@aip/config": "workspace:*",
+    "@aip/database": "workspace:*",
+    "@aip/logging": "workspace:*",
+    "@aip/queue": "workspace:*",
+    "@aip/research": "workspace:*",
+    "@aip/storage": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  }
+}
