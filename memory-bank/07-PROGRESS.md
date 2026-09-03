@@ -9,6 +9,7 @@ ENSAR asked for a browser URL on Vercel, with the repo also on GitHub.
 - GitHub remains the source of truth: `https://github.com/Ensar3can/makaleapp` (public)
 - Vercel project `ensar-ueccan/makaleapp` is linked to that GitHub repo, root `apps/web`
 - Production boot on Vercel allows in-memory Redis only because `VERCEL=1` (D-032)
+- `sitemap.xml` stays dynamic and falls back to core public URLs if the database is unreachable, so Vercel can build without SQL Server
 - SQL Server, worker, and SMTP are not on Vercel; discovery pages will not have live article data until Wave A has a real database host
 
 Gate results:
