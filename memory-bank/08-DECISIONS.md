@@ -51,3 +51,4 @@ Short log. Full ADRs live in `docs/adr/`.
 | D-029 | Presentation UI kit lives in `apps/web/components/ui`. Stitch CSS classes remain the visual tokens. Pages compose primitives; they do not invent new button/field/alert styles. |
 | D-030 | Task 7: listing search debounces existing GET URLs (no new search API). User avatar URLs stay on native lazy `<img>` so the Next image optimizer cannot fetch untrusted hosts. Cursor “Load more” stays; infinite scroll was not added. |
 | D-031 | Task 9: unauthenticated page guards redirect to `/login?next=` with a validated internal path. Open redirects and `/api`/`/_next`/auth loops fall back to `/dashboard`. `requirePageSession` rethrows non-auth failures instead of masking them as login. |
+| D-032 | Vercel Next.js preview may use `memory://` Redis when `VERCEL=1`. Compose/production hosts still require a real Redis URL. SQL Server, worker, and SMTP stay off Vercel. |

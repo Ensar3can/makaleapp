@@ -44,7 +44,7 @@ Copy `.env.example` to `.env` before running the apps.
 
 ## Repository
 
-Private source of truth: [github.com/Ensar3can/makaleapp](https://github.com/Ensar3can/makaleapp). Default branch is `main`.
+Source of truth: [github.com/Ensar3can/makaleapp](https://github.com/Ensar3can/makaleapp). Default branch is `main`. Vercel hosts the Next.js app from `apps/web`; it is not a full production stack (SQL Server, Redis, and the worker stay off Vercel).
 
 ```powershell
 git push origin main

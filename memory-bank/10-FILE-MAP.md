@@ -24,6 +24,7 @@ Update this when public symbols or important files are added.
 | Deploy / backup / rollback | `docs/DEPLOYMENT.md` |
 | Docker Compose / images | `docker-compose.yml`, `docker/Dockerfile` |
 | CI | `.github/workflows/ci.yml` |
+| Vercel Next.js app | `apps/web/vercel.json` |
 | Typecheck / Prisma generate wrappers | `scripts/typecheck.mjs`, `scripts/prisma-generate.mjs` |
 | Production Redis config | `docker/redis.conf` |
 | Production env template | `.env.production.example` |

@@ -99,7 +99,14 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
 
   const redisDriver = parsed.REDIS_URL.startsWith('memory:') ? 'memory' : 'redis';
 
-  if (parsed.NODE_ENV === 'production' && redisDriver === 'memory' && !isNextProductionBuild) {
+  const vercelRuntime = env.VERCEL === '1';
+
+  if (
+    parsed.NODE_ENV === 'production' &&
+    redisDriver === 'memory' &&
+    !isNextProductionBuild &&
+    !vercelRuntime
+  ) {
     throw new Error('REDIS_URL must be a Redis URL when NODE_ENV=production');
   }
 

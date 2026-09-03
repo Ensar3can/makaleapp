@@ -1,0 +1,10 @@
+.data
+.env
+.env.docker
+.env.local
+docs/stitch-exports
+coverage
+playwright-report
+test-results
+.turbo
+**/.next/cache

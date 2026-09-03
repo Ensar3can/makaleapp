@@ -2,6 +2,22 @@
 
 Append-only. Newest entries at the top.
 
+## 2026-09-03 — Vercel preview host
+
+ENSAR asked for a browser URL on Vercel, with the repo also on GitHub.
+
+- GitHub remains the source of truth: `https://github.com/Ensar3can/makaleapp` (public)
+- Vercel project `ensar-ueccan/makaleapp` is linked to that GitHub repo, root `apps/web`
+- Production boot on Vercel allows in-memory Redis only because `VERCEL=1` (D-032)
+- SQL Server, worker, and SMTP are not on Vercel; discovery pages will not have live article data until Wave A has a real database host
+
+Gate results:
+
+- `pnpm lint` — pass
+- `pnpm typecheck` — pass
+- `pnpm test` — pass (281 / 52)
+- `pnpm build` — pass
+
 ## 2026-09-03 — GitHub sync + post-v1.0 backlog
 
 ENSAR asked to publish the repo to GitHub and keep `main` current, plus a gap list and a plan.

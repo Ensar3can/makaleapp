@@ -2,9 +2,9 @@
 
 ## Current phase
 
-Post-v1.0 — GitHub sync + backlog planning
+Post-v1.0 — GitHub + Vercel preview host
 
-**Status:** Production frontend v1.0 is closed. Local repo is being published to GitHub `main`. Next product work waits for ENSAR to pick a wave.
+**Status:** Production frontend v1.0 is closed. Source is on GitHub `main`. A Vercel Next.js preview exists so the UI can be opened in a browser. That host is not Wave A go-live: there is no public SQL Server, Redis, worker, or SMTP.
 
 ## Backend check
 
@@ -16,12 +16,14 @@ Numbered backend phases 0–16 remain complete. Intentionally remaining (not v1.
 - Admin category/user CRUD has no use cases (screens are reserved empty)
 - Docker CLI was not installed on the Windows workstation
 
-## GitHub
+## GitHub and Vercel
 
-- Remote: `https://github.com/Ensar3can/makaleapp.git` (private)
+- Remote: `https://github.com/Ensar3can/makaleapp` (public)
 - Default branch: `main` (local `master` tracks `origin/main`)
 - Tracking issue: https://github.com/Ensar3can/makaleapp/issues/1
 - CI: `.github/workflows/ci.yml` on push/PR
+- Vercel project: `ensar-ueccan/makaleapp`, Git connected to `Ensar3can/makaleapp`, root `apps/web`
+- Preview URL: `https://makaleapp.vercel.app` (confirm after first production deploy)
 - Do not commit `.env` files
 
 ## Goal

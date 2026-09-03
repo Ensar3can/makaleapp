@@ -116,6 +116,15 @@ describe('loadConfig', () => {
         NEXT_PHASE: 'phase-production-build',
       }).redisDriver,
     ).toBe('memory');
+
+    expect(
+      loadConfig({
+        NODE_ENV: 'production',
+        SESSION_PEPPER: 'production-pepper-ok',
+        REDIS_URL: 'memory://local',
+        VERCEL: '1',
+      }).redisDriver,
+    ).toBe('memory');
   });
 
   it('requires https APP_URL in production except loopback', () => {
